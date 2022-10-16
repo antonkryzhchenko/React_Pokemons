@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/React_Pokemons.git/static/css/main.c7ec3132.css",
+    "main.js": "/React_Pokemons.git/static/js/main.2f131742.js",
+    "index.html": "/React_Pokemons.git/index.html",
+    "main.c7ec3132.css.map": "/React_Pokemons.git/static/css/main.c7ec3132.css.map",
+    "main.2f131742.js.map": "/React_Pokemons.git/static/js/main.2f131742.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c7ec3132.css",
+    "static/js/main.2f131742.js"
+  ]
+}
