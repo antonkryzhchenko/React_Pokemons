@@ -19,7 +19,8 @@ class PokemonsApp extends React.Component {
   componentDidMount() {
     axios.get(`${url}`).then((response) => {
       const pokemons = response.data.results;
-      this.setState({ pokemons });
+      const next = response.data.next;
+      this.setState({ pokemons, next });
     });
   }
 
