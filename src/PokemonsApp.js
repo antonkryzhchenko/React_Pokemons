@@ -1,88 +1,126 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import styles from "./pokemonsApp.module.css";
 import PokemonList from "./components/PokemonList";
 import PokemonDetails from "./components/PokemonDetails";
 
 const url = "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=20";
-let pokemonUrl = "";
-class PokemonsApp extends React.Component {
-  state = {
-    pokemons: null,
-    selectedPokemon: null,
-    pokemonDetails: null,
-    pokemonUrl: null,
-    previous: null,
-    next: url,
-  };
 
-  componentDidMount() {
+// class PokemonsApp extends React.Component {
+
+  const PokemonsApp = () => {
+
+  // state = {
+  //   pokemons: null,
+  //   selectedPokemon: null,
+  //   pokemonDetails: null,
+  //   pokemonUrl: null,
+  //   previous: null,
+  //   next: url,
+  // };
+
+  const [pokemons, setPokemons] = useState(null);
+  const [selectedPokemon, setSelectedPokemon] = useState(null);
+  const [pokemonDetails, setPokemonDetails] = useState(null);
+  const [pokemonUrl, setPokemonUrl] = useState(null);
+  const [previous, setPrevious] = useState(null);
+  const [next, setNext] = useState(url);
+
+  // componentDidMount() {
+  //   axios.get(`${url}`).then((response) => {
+  //     const pokemons = response.data.results;
+  //     const next = response.data.next;
+  //     this.setState({ pokemons, next });
+  //   });
+  // }
+
+  // on hooks
+  useEffect(() => {
     axios.get(`${url}`).then((response) => {
-      const pokemons = response.data.results;
-      const next = response.data.next;
-      this.setState({ pokemons, next });
-    });
-  }
+          const pokemons = response.data.results;
+          const next = response.data.next;
+          // this.setState({ pokemons, next });
+          setPokemons(pokemons);
+          setNext(next);
+        });
+  }, []);
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.selectedPokemon !== prevState.selectedPokemon) {
-      this.fetchData(this.state.selectedPokemon);
+  // componentDidUpdate(prevProps, prevState) {
+  //   if (this.state.selectedPokemon !== prevState.selectedPokemon) {
+  //     this.fetchData(this.state.selectedPokemon);
+  //   }
+
+  //   if (this.state.pokemonUrl !== prevState.pokemonUrl) {
+  //     this.fetchData(this.state.pokemonUrl);
+  //   }
+  // }
+
+  // on hooks
+  useEffect(() => {
+    if (selectedPokemon !== null) {
+      fetchData(selectedPokemon);
     }
+  }, [selectedPokemon]);
 
-    if (this.state.pokemonUrl !== prevState.pokemonUrl) {
-      this.fetchData(this.state.pokemonUrl);
-    }
-  }
-
-  getInfo = (name) => {
-    const selectedPokemon = this.state.pokemons.filter((pokemon) => {
+  const getInfo = (name) => {
+    const selectedPokemon = pokemons.filter((pokemon) => {
       if (pokemon.name === name) {
-        pokemonUrl = pokemon.url;
+        let pokemonUrl = pokemon.url;
+        setPokemonUrl(pokemonUrl);
+        
         return pokemon;
       }
-
       return null;
     });
 
-    this.setState({
-      selectedPokemon: selectedPokemon[0].results,
-      pokemonUrl: pokemonUrl,
-    });
+    // this.setState({
+    //   selectedPokemon: selectedPokemon[0].results,
+    //   pokemonUrl: pokemonUrl,
+    // });
+    setSelectedPokemon(selectedPokemon);
   };
 
-  fetchData = () => {
+  const fetchData = () => {
     axios.get(`${pokemonUrl}`).then((response) => {
       const pokemonDetails = response.data;
-      this.setState({ pokemonDetails });
+      // this.setState({ pokemonDetails });
+      setPokemonDetails(pokemonDetails);
     });
   };
 
-  capitalizeFirstLetter = (str) => {
+  const capitalizeFirstLetter = (str) => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   };
 
-  prevPage = () => {
-    if (this.state.previous !== null) {
-      axios.get(`${this.state.previous}`).then((response) => {
+  const prevPage = () => {
+    if (previous !== null) {
+      axios.get(`${previous}`).then((response) => {
         const next = response.data.next;
         const previous = response.data.previous;
         const pokemons = response.data.results;
-        this.setState({ next, previous, pokemons });
+        // this.setState({ next, previous, pokemons });
+
+        setNext(next);
+        setPrevious(previous);
+        setPokemons(pokemons);
       });
     }
   };
 
-  nextPage = () => {
-    axios.get(`${this.state.next}`).then((response) => {
+  const nextPage = () => {
+    axios.get(`${next}`).then((response) => {
       const next = response.data.next;
       const previous = response.data.previous;
       const pokemons = response.data.results;
-      this.setState({ next, previous, pokemons });
+      // this.setState({ next, previous, pokemons });
+      setNext(next);
+      setPrevious(previous);
+      setPokemons(pokemons);
     });
   };
 
-  render() {
-    const { pokemons, pokemonDetails } = this.state;
+  // render() {
+  //   const { pokemons, pokemonDetails } = this.state;
 
     if (!pokemons) {
       return (
@@ -98,29 +136,29 @@ class PokemonsApp extends React.Component {
           <div className={styles.pokemons}>
             <PokemonList
               pokemons={pokemons}
-              getInfo={this.getInfo}
-              capitalizeFirstLetter={this.capitalizeFirstLetter}
+              getInfo={getInfo}
+              capitalizeFirstLetter={capitalizeFirstLetter}
             />
 
             {pokemonDetails && (
               <PokemonDetails
-                capitalizeFirstLetter={this.capitalizeFirstLetter}
+                capitalizeFirstLetter={capitalizeFirstLetter}
                 pokemonDetails={pokemonDetails}
                 url={pokemonUrl}
-                getInfo={this.getInfo}
+                getInfo={getInfo}
               />
             )}
           </div>
           <div className={styles.pokemonAppButtons}>
             <button
               className={styles.pokemonAppBtn}
-              onClick={() => this.prevPage()}
+              onClick={() => prevPage()}
             >
               PREVIOUS
             </button>
             <button
               className={styles.pokemonAppBtn}
-              onClick={() => this.nextPage()}
+              onClick={() => nextPage()}
             >
               NEXT
             </button>
@@ -129,5 +167,5 @@ class PokemonsApp extends React.Component {
       </div>
     );
   }
-}
+// }
 export default PokemonsApp;
