@@ -3,6 +3,7 @@ import axios from "axios";
 import styles from "./pokemonsApp.module.css";
 import PokemonList from "./components/PokemonList";
 import PokemonDetails from "./components/PokemonDetails";
+import Search from "./components/Search";
 
 const url = "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=20";
 
@@ -25,6 +26,7 @@ const url = "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=20";
   const [pokemonUrl, setPokemonUrl] = useState(null);
   const [previous, setPrevious] = useState(null);
   const [next, setNext] = useState(url);
+  const [inputValue, setInputValue] = useState();
 
   // componentDidMount() {
   //   axios.get(`${url}`).then((response) => {
@@ -61,6 +63,20 @@ const url = "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=20";
       fetchData(selectedPokemon);
     }
   }, [selectedPokemon]);
+
+  const filterPokemons = () => {
+    if (pokemons) {
+      let copyPokemons = [...pokemons];
+      if (inputValue) {
+        let filterPokemons = copyPokemons.filter((pokemon) => {
+          return pokemon.name.toLowerCase().includes(inputValue.toLowerCase().split(' ').join(''));
+        })
+        return filterPokemons;
+      }
+    }
+  }
+
+  const filteredPokemons = filterPokemons();
 
   const getInfo = (name) => {
     const selectedPokemon = pokemons.filter((pokemon) => {
@@ -133,9 +149,10 @@ const url = "https://pokeapi.co/api/v2/pokemon/?offset=0&limit=20";
     return (
       <div>
         <div>
+          <Search onChange={(e) => setInputValue(e.target.value)} />
           <div className={styles.pokemons}>
             <PokemonList
-              pokemons={pokemons}
+              pokemons={filteredPokemons ? filteredPokemons : pokemons}
               getInfo={getInfo}
               capitalizeFirstLetter={capitalizeFirstLetter}
             />
